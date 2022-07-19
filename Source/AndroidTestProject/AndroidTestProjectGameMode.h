@@ -7,13 +7,14 @@
 #include "AndroidTestProjectGameMode.generated.h"
 
 UCLASS(minimalapi)
-class AAndroidTestProjectGameMode : public AGameModeBase
+class AAndroidTestProjectGameMode final : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
 	AAndroidTestProjectGameMode();
+
+	int32 GetNumPlayers() override;
+
+	int32 GetNumSpectators() override;
 };
-
-
-

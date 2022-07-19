@@ -69,26 +69,30 @@ void AAndroidTestProjectPlayerController::OnSetDestinationPressed()
 	bInputPressed = true;
 	// Just in case the character was moving because of a previous short press we stop it
 	StopMovement();
+
+	FHitResult Hit;
+	if (bIsTouch)
+	{
+		GetHitResultUnderFinger(ETouchIndex::Touch1, ECC_Visibility, true, Hit);
+	}
+	else
+	{
+		GetHitResultUnderCursor(ECC_Visibility, true, Hit);
+	}
+	LastPressedLocation = Hit.Location;
 }
 
 void AAndroidTestProjectPlayerController::OnSetDestinationReleased()
 {
-	// Player is no longer pressing the input
-	bInputPressed = false;
-
 	// If it was a short press
 	if(FollowTime <= ShortPressThreshold)
 	{
-		// We look for the location in the world where the player has pressed the input
-		FVector HitLocation = FVector::ZeroVector;
-		FHitResult Hit;
-		GetHitResultUnderCursor(ECC_Visibility, true, Hit);
-		HitLocation = Hit.Location;
-
 		// We move there and spawn some particles
-		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, HitLocation);
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, HitLocation, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
+		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, LastPressedLocation);
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, LastPressedLocation, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
 	}
+
+	bInputPressed = false;
 }
 
 void AAndroidTestProjectPlayerController::OnTouchPressed(const ETouchIndex::Type FingerIndex, const FVector Location)
@@ -99,6 +103,6 @@ void AAndroidTestProjectPlayerController::OnTouchPressed(const ETouchIndex::Type
 
 void AAndroidTestProjectPlayerController::OnTouchReleased(const ETouchIndex::Type FingerIndex, const FVector Location)
 {
-	bIsTouch = false;
 	OnSetDestinationReleased();
+	bIsTouch = false;
 }

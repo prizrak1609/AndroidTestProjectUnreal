@@ -24,3 +24,13 @@ AAndroidTestProjectGameMode::AAndroidTestProjectGameMode()
 		PlayerControllerClass = PlayerControllerBPClass.Class;
 	}
 }
+
+int32 AAndroidTestProjectGameMode::GetNumPlayers()
+{
+	return 1;
+}
+
+int32 AAndroidTestProjectGameMode::GetNumSpectators()
+{
+	return 0;
+}

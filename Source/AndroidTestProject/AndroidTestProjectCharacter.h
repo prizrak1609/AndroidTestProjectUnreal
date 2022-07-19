@@ -14,9 +14,6 @@ class AAndroidTestProjectCharacter : public ACharacter
 public:
 	AAndroidTestProjectCharacter();
 
-	// Called every frame.
-	virtual void Tick(float DeltaSeconds) override;
-
 	/** Returns TopDownCameraComponent subobject **/
 	FORCEINLINE class UCameraComponent* GetTopDownCameraComponent() const { return TopDownCameraComponent; }
 	/** Returns CameraBoom subobject **/

@@ -44,8 +44,3 @@ AAndroidTestProjectCharacter::AAndroidTestProjectCharacter()
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = true;
 }
-
-void AAndroidTestProjectCharacter::Tick(float DeltaSeconds)
-{
-    Super::Tick(DeltaSeconds);
-}
