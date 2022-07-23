@@ -28,5 +28,5 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	TArray<UArrowComponent*> spawnPlaces;
+	TArray<UPrimitiveComponent*> spawnPlaces;
 };

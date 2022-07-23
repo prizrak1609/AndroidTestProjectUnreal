@@ -14,6 +14,6 @@ class UGameUtils : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 public:
-	static void Print(FString text);
-	static void PrintError(FString text);
+	static void Print(FString text, bool onScreen = true);
+	static void PrintError(FString text, bool onScreen = true);
 };

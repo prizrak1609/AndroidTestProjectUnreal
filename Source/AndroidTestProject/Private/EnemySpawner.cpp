@@ -4,6 +4,9 @@
 #include "EnemySpawner.h"
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
+#include "Runtime\Engine\Classes\Camera\CameraComponent.h"
+#include "AndroidTestProject/AndroidTestProjectCharacter.h"
+#include "Runtime\Engine\Classes\Components\BoxComponent.h"
 #include "GameUtils.h"
 
 // Sets default values
@@ -15,7 +18,7 @@ AEnemySpawner::AEnemySpawner()
 
 bool AEnemySpawner::SpawnRandomActors(int count)
 {
-	TArray<UArrowComponent*> invisiblePlaces = spawnPlaces.FilterByPredicate([](UArrowComponent* item) { return item->GetLastRenderTime() < 0.3; });
+	TArray<UPrimitiveComponent*> invisiblePlaces = spawnPlaces.FilterByPredicate([](UPrimitiveComponent* item) { return !item->WasRecentlyRendered(); });
 
 	if (invisiblePlaces.IsEmpty())
 	{
@@ -28,25 +31,25 @@ bool AEnemySpawner::SpawnRandomActors(int count)
 	{
 		int index = FMath::RandRange(0, invisiblePlaces.Num() - 1);
 
-		UArrowComponent* spawnPlace = invisiblePlaces[index];
+		UPrimitiveComponent* spawnPlace = invisiblePlaces[index];
 
 		FActorSpawnParameters params;
 		params.bNoFail = false;
 		params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::DontSpawnIfColliding;
 		FGraphEventRef event = FFunctionGraphTask::CreateAndDispatchWhenReady([&i, this, spawnPlace, &params, &result] {
-				for (int j = 0; j < 3; j++)
+			for (int j = 0; j < 3; j++)
+			{
+				if (GetWorld()->SpawnActor<AActor>(CharacterClass, spawnPlace->GetComponentLocation(), FRotator::ZeroRotator, params) == nullptr)
 				{
-					if (GetWorld()->SpawnActor<AActor>(CharacterClass, spawnPlace->GetComponentLocation(), FRotator::ZeroRotator, params) == nullptr)
-					{
-						UGameUtils::PrintError(FString::Printf(TEXT("Failed to spawn actors %d"), j));
-						result = result || false;
-					}
-					else
-					{
-						result = result || true;
-						break;
-					}
+					UGameUtils::PrintError(FString::Printf(TEXT("Failed to spawn actors %d"), j), false);
+					result = result || false;
 				}
+				else
+				{
+					result = result || true;
+					break;
+				}
+			}
 			}, TStatId{}, nullptr, ENamedThreads::GameThread);
 		FTaskGraphInterface::Get().WaitUntilTaskCompletes(event);
 	}
@@ -63,7 +66,7 @@ void AEnemySpawner::BeginPlay()
 
 	for (USceneComponent* component : childrens)
 	{
-		UArrowComponent* place = Cast<UArrowComponent>(component);
+		UPrimitiveComponent* place = Cast<UPrimitiveComponent>(component);
 		if (place != nullptr)
 		{
 			spawnPlaces.Add(place);
