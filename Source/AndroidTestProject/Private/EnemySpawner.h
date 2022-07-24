@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Runtime\Engine\Classes\Components\ArrowComponent.h"
+#include <atomic>
 
 #include "EnemySpawner.generated.h"
 
-UCLASS()
+UCLASS() 
 class AEnemySpawner : public AActor
 {
 	GENERATED_BODY()
@@ -21,7 +22,16 @@ public:
 	TSubclassOf<AActor> CharacterClass;
 
 	UFUNCTION(BlueprintCallable)
-	bool SpawnRandomActors(int count = 1);
+	bool SpawnRandomActor();
+	 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Spawn)
+	int MaxActors;
+
+	UFUNCTION(BlueprintCallable, Category = Spawn)
+	void ChildIsDestroyed();
+
+	UFUNCTION(BlueprintCallable, Category = Spawn)
+	void ChildIsCreated();
 
 protected:
 	// Called when the game starts or when spawned
@@ -29,4 +39,6 @@ protected:
 
 private:
 	TArray<UPrimitiveComponent*> spawnPlaces;
+
+	std::atomic_int SpawnedActors = ATOMIC_VAR_INIT(0);
 };
